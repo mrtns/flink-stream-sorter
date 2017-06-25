@@ -12,6 +12,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <junit.version>4.12</junit.version>
+    <jackson.version>2.7.0</jackson.version>
   </properties>
 
   <dependencies>
@@ -20,13 +22,28 @@
       <artifactId>flink-streaming-java_2.10</artifactId>
       <version>1.2.1</version>
     </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
 
+    <!-- test dependencies -->
+
+    <dependency>
+      <groupId>org.apache.flink</groupId>
+      <artifactId>flink-test-utils_2.10</artifactId>
+      <version>1.2.1</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <version>${junit.version}</version>
+      <type>jar</type>
       <scope>test</scope>
     </dependency>
+
   </dependencies>
   <build>
     <plugins>

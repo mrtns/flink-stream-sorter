@@ -1,38 +1,30 @@
 package com.dataartisans;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.apache.flink.streaming.util.StreamingProgramTestBase;
 
 /**
- * Unit test for simple App.
+ * {@link App} program should execute successfully.
  */
-public class AppTest 
-    extends TestCase
+public class AppTest extends StreamingProgramTestBase
 {
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public AppTest( String testName )
-    {
-        super( testName );
+    private String inputPath;
+    private String outputPath;
+
+    @Override
+    protected void preSubmit() throws Exception {
+        inputPath = createTempFile("AppTest_Input.txt", AppData.EVENT_STREAM_AS_LINEWISE_JSON);
+        outputPath = getTempDirPath("AppTest_Output");
     }
 
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( AppTest.class );
+    @Override
+    protected void postSubmit() throws Exception {
+        compareResultsByLinesInMemory(AppData.EVENT_STREAM_AS_LINEWISE_JSON, outputPath);
     }
 
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
+    @Override
+    protected void testProgram() throws Exception {
+        App.main(new String[]{
+                "--inputPath", inputPath,
+                "--outputPath", outputPath});
     }
 }
