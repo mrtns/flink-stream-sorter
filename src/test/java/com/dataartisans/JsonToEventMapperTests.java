@@ -6,6 +6,9 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+/**
+ * Tests for {@link JsonToEventMapper}.
+ */
 public class JsonToEventMapperTests {
     @Test
     public void shouldParseJsonStringToEventObject() {
@@ -13,7 +16,7 @@ public class JsonToEventMapperTests {
         Event result = null;
 
         try {
-            result = new App.JsonToEventMapper().map(validJsonString);
+            result = new JsonToEventMapper().map(validJsonString);
         } catch (Exception e) {
             fail(e.toString());
         }
