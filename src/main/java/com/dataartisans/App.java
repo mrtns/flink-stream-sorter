@@ -49,25 +49,19 @@ public class App {
     }
 
     public static class JsonToEventMapper implements MapFunction<String, Event> {
-        private transient ObjectMapper jsonMapper;
+        private static final ObjectMapper jsonMapper = new ObjectMapper();
 
         @Override
         public Event map(String value) throws Exception {
-            if (jsonMapper == null) {
-                jsonMapper = new ObjectMapper();
-            }
             return jsonMapper.readValue(value, Event.class);
         }
     }
 
     public static class EventToJsonMapper implements MapFunction<Event, String> {
-        private transient ObjectMapper jsonMapper;
+        private static final ObjectMapper jsonMapper = new ObjectMapper();
 
         @Override
         public String map(Event value) throws Exception {
-            if (jsonMapper == null) {
-                jsonMapper = new ObjectMapper();
-            }
             return jsonMapper.writeValueAsString(value);
         }
     }
