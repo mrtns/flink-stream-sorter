@@ -8,7 +8,7 @@ import static org.junit.Assert.fail;
 
 public class JsonToEventMapperTests {
     @Test
-    public void shouldParseSuccessfully() {
+    public void shouldParseJsonStringToEventObject() {
         String validJsonString = "{\"time\":1498404088692,\"someData\":\"some data value\"}";
         Event result = null;
 
