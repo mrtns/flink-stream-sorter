@@ -13,7 +13,7 @@ import org.apache.flink.streaming.runtime.streamrecord.StreamRecord;
 public class AppFunctions {
     public static DataStream<Event> assignTimestampsAndWatermarks(DataStream<Event> stream) {
         Time maxAllowedLatenessForEventGeneratorSource = Time.milliseconds(EventGenerator.OutOfOrderness);
-        stream.assignTimestampsAndWatermarks(
+        DataStream<Event> result = stream.assignTimestampsAndWatermarks(
                 new BoundedOutOfOrdernessTimestampExtractor<Event>(maxAllowedLatenessForEventGeneratorSource) {
                     @Override
                     public long extractTimestamp(Event element) {
@@ -21,7 +21,7 @@ public class AppFunctions {
                     }
                 }
         );
-        return stream;
+        return result;
     }
 
     public static DataStream<Event> orderEventStream(DataStream<Event> stream) {
