@@ -5,8 +5,7 @@ import org.apache.flink.streaming.util.StreamingProgramTestBase;
 /**
  * Tests for {@link App}.
  */
-public class AppTests
-{
+public class AppTests {
     public static class ShouldExecuteSuccessfully extends StreamingProgramTestBase {
 
         public static final String INPUT_DATA_AS_LINEWISE_JSON = ""
