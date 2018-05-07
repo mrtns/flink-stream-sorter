@@ -2,13 +2,22 @@ package com.dataartisans;
 
 import com.dataartisans.provided.Event;
 import com.dataartisans.provided.EventGenerator;
+import org.apache.flink.api.common.state.ValueState;
+import org.apache.flink.api.common.state.ValueStateDescriptor;
+import org.apache.flink.api.common.typeinfo.TypeHint;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.streaming.api.TimerService;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor;
 import org.apache.flink.streaming.api.operators.AbstractStreamOperator;
+import org.apache.flink.streaming.api.operators.InternalTimerService;
 import org.apache.flink.streaming.api.operators.OneInputStreamOperator;
+import org.apache.flink.streaming.api.operators.StreamingRuntimeContext;
 import org.apache.flink.streaming.api.watermark.Watermark;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.runtime.streamrecord.StreamRecord;
+
+import java.util.PriorityQueue;
 
 public class AppFunctions {
     public static DataStream<Event> assignTimestampsAndWatermarks(DataStream<Event> stream) {
@@ -32,8 +41,32 @@ public class AppFunctions {
     private static class OrderOperator<T> extends AbstractStreamOperator<T> implements OneInputStreamOperator<T, T> {
         private static final long serialVersionUID = 607406801052018312L;
 
+        private ValueState<PriorityQueue<Event>> queueState = null;
+
+        @Override
+        public void open() throws Exception {
+            ValueStateDescriptor<PriorityQueue<Event>> descriptor = new ValueStateDescriptor<>(
+                    "events-sorted",
+                    TypeInformation.of(new TypeHint<PriorityQueue<Event>>() {})
+            );
+            queueState = getRuntimeContext().getState(descriptor);
+        }
+
         @Override
         public void processElement(StreamRecord<T> streamRecord) throws Exception {
+            StreamingRuntimeContext context = getRuntimeContext();
+            InternalTimerService<Event> timerService = getInternalTimerService()
+            TimerService timerService = context.timerService();
+
+            if (context.timestamp() > timerService.currentWatermark()) {
+                PriorityQueue<Event> queue = queueState.value();
+                if (queue == null) {
+                    queue = new PriorityQueue<>(10, new CompareByTimestampAscending());
+                }
+                queue.add(event);
+                queueState.update(queue);
+                timerService.registerEventTimeTimer(event.timestamp);
+            }
             // this method is called for each incoming stream record
             // System.out.println(String.format("streamRecord.hasTimeStamp? %s", streamRecord.hasTimestamp()));
         }
